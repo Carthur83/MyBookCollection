@@ -1,5 +1,58 @@
 ﻿@page "/"
+    <nav class="navbar bg-primary">
+        <div class="container-fluid d-flex px-3">
+            <div class="d-flex text-light py-4 gap-2 w-100 align-items-center">
+                <i class="bi bi-book h2 mb-0"></i>
+                <h2 class="fw-bold mb-0">Min Samling</h2>
+                <i class="bi bi-funnel h2 ms-auto mb-0"></i>
+            </div>
+            <form class="d-flex w-100 mb-3 position-relative" role="search">
+                <i class="bi bi-search position-absolute"></i>
+                <input class="form-control search-input input" type="search" placeholder="Sök" aria-label="Search" />
+            </form>
+        </div>
+    </nav>
 
-<h1>Hello, world!</h1>
+    <div class="px-3 py-3">
+        <div class="d-flex w-100 align-items-end mt-2">
+            <h3 class="fw-semibold fs-3 mb-0">Alla böcker</h3>
+            <p class="small ms-auto mb-0">6 böcker</p>
+        </div>
 
-Welcome to your new app.
+        <div class="mt-4 d-flex flex-column gap-3">
+            <div class="book-card">
+                <div class="img-container">
+                    <img src="/images/mist.png" alt="">
+                </div>
+                <div class="card-info">
+                    <h5 class="card-title fw-semibold">The Mist</h5>
+                    <p class="card-author">Stephen King</p>
+                    <div class="d-flex gap-2 mt-2">
+                        <span class="badge rounded-pill badge-condition-good">Bra</span>
+                        <span class="badge rounded-pill badge-type">Inbunden</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center ms-auto">
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+            </div>
+
+            <div class="book-card">
+                <div class="img-container">
+                    <img src="/images/mist.png" alt="">
+                </div>
+                <div class="card-info">
+                    <h5 class="card-title fw-semibold">The Shining</h5>
+                    <p class="card-author">Stephen King</p>
+                    <div class="d-flex gap-2 mt-2">
+                        <span class="badge rounded-pill badge-condition-new">Nyskick</span>
+                        <span class="badge rounded-pill badge-type">Pocket</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center ms-auto">
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+

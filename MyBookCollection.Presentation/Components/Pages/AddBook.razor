@@ -1,0 +1,78 @@
+﻿@page "/addbook"
+
+
+<header class="navbar bg-primary">
+    <div class="container-fluid d-flex px-3">
+        <div class="d-flex text-light py-4 gap-2 w-100 align-items-center justify-content-center">
+            <h1 class="fw-bold mb-0">Lägg till bok</h1>
+        </div>
+    </div>
+</header>
+
+<div class="px-3 py-3">
+
+    <form>
+        <label class="pb-2">Bokomslag</label>
+        <div class="upload-container mb-3">
+            <div class="px-5 py-3">
+                <div class="img-preview">
+                    <i class="bi bi-upload fs-1"></i>
+                </div>
+
+                <button type="file"
+                        class="btn btn-primary w-100 mt-3 d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-upload"></i>
+                    Välj en bild
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Titel</label>
+
+            <input type="text" class="form-control is-invalid">
+
+            <div class="invalid-feedback">
+                Du måste ange en titel
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Författare</label>
+            <input type="text" class="form-control input">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Skick</label>
+            <select class="form-select input">
+                <option selected>Välj</option>
+                <option value="1">One</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Typ</label>
+            <select class="form-select input">
+                <option selected>Välj</option>
+                <option value="1">One</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Utgåva</label>
+            <input type="text" class="form-control input">
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Beskrivning</label>
+            <textarea class="form-control input" rows="4"></textarea>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-custom">Lägg till bok</button>
+    </form>
+
+</div>

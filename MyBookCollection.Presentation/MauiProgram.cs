@@ -1,4 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using MyBookCollection.Business.Interfaces;
+using MyBookCollection.Business.Services;
+using MyBookCollection.Data.Contexts;
+using MyBookCollection.Data.Interfaces;
+using MyBookCollection.Data.Repositories;
 
 namespace MyBookCollection.Presentation
 {
@@ -14,10 +20,24 @@ namespace MyBookCollection.Presentation
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
+            var dbPath = Path.Combine(FileSystem.AppDataDirectory, "books.db");
+
+            builder.Services.AddSingleton<DataContext>(x =>
+            {
+                var context = new DataContext(dbPath);
+                context.Database.Migrate();
+                Console.WriteLine($"Database path: {dbPath}");
+
+                return context;
+            });
+
             builder.Services.AddMauiBlazorWebView();
 
+            builder.Services.AddScoped<IBookRepository, BookRepository>();
+            builder.Services.AddScoped<IBookService, BookService>();
+
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
 
