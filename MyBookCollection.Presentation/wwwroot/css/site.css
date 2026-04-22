@@ -2,14 +2,23 @@
 :root {
     --color-gray-100: #6C7581;
     --color-gray-200: #6A7282;
-    --color-bg-good: #DBEAFE;
+
     --color-bg-new: #DCFCE7;
+    --color-bg-good: #DBEAFE;
+    --color-bg-worn: #FEF3C6;
+
     --color-bg-type: #EFEFEF;
-    --color-text-good: #3965EA;
+
     --color-text-new: #008236;
+    --color-text-good: #3965EA;
+    --color-text-worn: #BB4D00;
+
     --color-text-type: #364153;
+
     --color-text-gray: #4A5565;
+
     --color-chevron: #99A1AF;
+
     --color-border: #D1D5DC;
 }
 
@@ -30,6 +39,10 @@ body {
     background-color: #F9FAFB;
 }
 
+main {
+    padding-bottom: 120px;
+}
+
 p {
     margin: 0;
 }
@@ -40,6 +53,14 @@ p {
 
 .mt-6 {
     margin-top: 5rem;
+}
+
+.mb-6 {
+    margin-bottom: 4rem;
+}
+
+.mb-7 {
+    margin-bottom: 5rem;
 }
 
 .pb-6 {
@@ -101,7 +122,12 @@ input.invalid {
     border: 1px solid rgba(0,0,0,0.05);
     box-shadow: 0 1px 2px rgba(0,0,0,0.08);
     background-color: #ffffff;
+    transition: transform 0.1s ease;
 }
+
+    .book-card:active {
+        transform: scale(0.97);
+    }
 
     .book-card .img-container {
         width: 80px;
@@ -114,6 +140,17 @@ input.invalid {
             width: 100%;
             height: 100%;
         }
+
+    .book-card .no-image {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        height: 100%;
+        border-radius: 14px;
+        border: 2px solid #d8dadd;
+        background-color: #edeef0da;
+    }
 
 .card-info {
     padding: 0.8rem;
@@ -138,6 +175,12 @@ input.invalid {
 .badge-condition-good {
     background-color: var(--color-bg-good);
     color: var(--color-text-good);
+    font-weight: 500;
+}
+
+.badge-condition-worn {
+    background-color: var(--color-bg-worn);
+    color: var(--color-text-worn);
     font-weight: 500;
 }
 
@@ -170,8 +213,10 @@ input.invalid {
 
 .book-image {
     width: 100%;
-    height: 100%;
+    max-height: 256px;
     object-fit: contain;
+    border-radius: 14px;
+    overflow: hidden;
 }
 
 .author-details {
@@ -188,3 +233,16 @@ input.invalid {
     white-space: nowrap;
     border-radius: 14px 0 0 14px;
 }
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+

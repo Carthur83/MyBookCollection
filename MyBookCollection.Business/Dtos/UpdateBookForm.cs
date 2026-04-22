@@ -4,6 +4,8 @@ namespace MyBookCollection.Business.Dtos;
 
 public class UpdateBookForm
 {
+    public int Id { get; set; }
+
     [Required(ErrorMessage = "Titel krävs")]
     public string Title { get; set; } = null!;
     public string? Author { get; set; } = null!;

@@ -25,6 +25,7 @@ public static class MappingExtensions
     {
         return new BookModel
         {
+            Id = entity.Id,
             Title = entity.Title,
             Author = entity.Author,
             Condition = entity.Condition,
@@ -40,6 +41,7 @@ public static class MappingExtensions
     {
         return new BookEntity
         {
+            Id = form.Id,
             Title = form.Title,
             Author = form.Author,
             Condition = form.Condition,
@@ -48,6 +50,22 @@ public static class MappingExtensions
             PublishedYear = form.PublishedYear,
             Description = form.Description,
             ImageFileName = form.ImageFileName,
+        };
+    }
+
+    public static UpdateBookForm ToUpdateForm(this BookModel model)
+    {
+        return new UpdateBookForm
+        {
+            Id = model.Id,
+            Title = model.Title,
+            Author = model.Author,
+            Condition = model.Condition,
+            Type = model.Type,
+            Edition = model.Edition,
+            PublishedYear = model.PublishedYear,
+            Description = model.Description,
+            ImageFileName = model.ImageFileName,
         };
     }
 }

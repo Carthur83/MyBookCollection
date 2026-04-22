@@ -1,4 +1,7 @@
-﻿@page "/bookdetails"
+﻿@page "/bookdetails/{BookId:int}"
+@using MyBookCollection.Business.Models
+@inject IBookService BookService
+@inject NavigationManager NavManager
 
 <header class="navbar bg-primary">
     <div class="container-fluid d-flex px-3">
@@ -9,42 +12,158 @@
 </header>
 
 <div class="px-3 py-3">
-    <div class="book-image">
-        <img class="book-image" src="/images/mist.png" alt="">
+    <div>
+        @if (!string.IsNullOrEmpty(Book.ImageFileName))
+        {
+            <img class="book-image" src="@GetImage(Book.ImageFileName)" alt="">
+        }
+        else
+        {
+            <div class="book-image d-flex align-items-center justify-content-center bg-light">
+                <div class="text-center text-muted">
+                    <i class="bi bi-book" style="font-size: 2rem;"></i>
+                    <div>Ingen bild</div>
+                </div>
+            </div>
+        }
     </div>
 
     <div class="mt-3">
-        <h3 class="fs-3 mb-1">The Mist</h3>
-        <p class="author-details">Stephen King</p>
+        <h3 class="fs-3 mb-1">@Book.Title</h3>
+        <p class="author-details">@Book.Author</p>
     </div>
 
     <div class="mt-4">
         <div class="d-flex gap-2 mt-2">
-            <span class="badge rounded-pill badge-condition-good fs-14">Bra</span>
-            <span class="badge rounded-pill badge-type fs-14">Inbunden</span>
+            @switch (Book.Condition)
+            {
+                case "Nyskick":
+                    <span class="badge rounded-pill badge-condition-new fs-14">@Book.Condition</span>
+                    break;
+                case "Bra":
+                    <span class="badge rounded-pill badge-condition-good fs-14">@Book.Condition</span>
+                    break;
+                case "Sliten":
+                    <span class="badge rounded-pill badge-condition-worn fs-14">@Book.Condition</span>
+                    break;
+            }
+            <span class="badge rounded-pill badge-type fs-14">@Book.Type</span>
         </div>
         <div class="mt-2">
-            <span class="badge rounded-pill badge-type fs-14">Första utgåva 1979</span>
+            <span class="badge rounded-pill badge-type fs-14">@Book.Edition</span>
         </div>
     </div>
 
     <div class="mt-5">
         <h5>Beskrivning</h5>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In mollis, metus sit amet vulputate volutpat, nulla lorem efficitur turpis, in consequat sem elit eu nibh. </p>
+        <p>@Book.Description</p>
     </div>
 
-    <div class="d-flex flex-column gap-3 mt-6">
-        <button type="button" class="btn btn-primary btn-custom d-flex gap-2 align-items-center justify-content-center">
+    <div class="d-flex flex-column gap-3 mt-6 mb-7">
+        <button @onclick="GoToEdit" type="button" class="btn btn-primary btn-custom d-flex gap-2 align-items-center justify-content-center">
             <i class="bi bi-pencil"></i> Uppdatera
         </button>
-        <button type="button" class="btn btn-danger btn-custom d-flex gap-2 align-items-center justify-content-center">
-            <i class="bi bi-trash"></i>
-            Ta bort
+
+        <button type="button" class="btn btn-danger btn-custom d-flex gap-2 align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#deleteBookModal">
+            Radera bok
         </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="deleteBookModal" tabindex="-1" aria-labelledby="deleteBookModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered px-3">
+                <div class="modal-content border-0 rounded-4 shadow-sm">
+
+                    <div class="modal-body text-center p-4">
+                        <div class="mb-3">
+                            <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10"
+                                 style="width: 72px; height: 72px;">
+                                <span class="text-danger fs-2">🗑️</span>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold mb-2" id="deleteBookModalLabel">Ta bort bok</h5>
+
+                        <p class="text-muted mb-4">
+                            Är du säker på att du vill radera boken?<br>
+                            Detta går inte att ångra.
+                        </p>
+
+                        <div class="d-grid gap-2">
+                            <button @onclick="Delete" type="button" class="btn btn-danger btn-custom d-flex gap-2 align-items-center justify-content-center" data-bs-dismiss="modal">
+                                Ta bort
+                            </button>
+
+                            <button type="button" class="btn btn-light btn-custom" data-bs-dismiss="modal">
+                                Avbryt
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>
 
 @code {
+
+    [Parameter]
+    public int BookId { get; set; }
+    public BookModel Book { get; set; } = new();
+    public string ErrorMessage { get; set; } = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await BookService.GetBookAsync(x => x.Id == BookId);
+
+        if (!result.Success)
+        {
+            ErrorMessage = result.ErrorMessage!;
+            return;
+        }
+
+        Book = result.Value!;
+    }
+
+    private string GetImage(string fileName)
+    {
+        if (string.IsNullOrEmpty(fileName))
+            return null!;
+
+        var path = Path.Combine(FileSystem.AppDataDirectory, "images", fileName);
+
+        if (!File.Exists(path))
+            return null!;
+
+        var extension = Path.GetExtension(fileName).ToLower();
+        var mimeType = extension switch
+        {
+            ".png" => "image/png",
+            ".jpg" => "image/jpeg",
+            ".jpeg" => "image/jpeg",
+            _ => "image/jpeg"
+        };
+
+        var bytes = File.ReadAllBytes(path);
+        var base64 = Convert.ToBase64String(bytes);
+
+        return $"data:{mimeType};base64,{base64}";
+    }
+
+    public void GoToEdit()
+    {
+        NavManager.NavigateTo($"editbook/{Book.Id}");
+    }
+
+    public async Task Delete()
+    {
+        var result = await BookService.DeleteBookAsync(x => x.Id == Book.Id);
+
+        if (result.Success)
+        {
+            NavManager.NavigateTo("/");
+        }
+    }
 
 }

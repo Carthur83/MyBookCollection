@@ -1,5 +1,6 @@
 ﻿@page "/addbook"
-
+@inject IBookService BookService
+@inject NavigationManager NavManager
 
 <header class="navbar bg-primary">
     <div class="container-fluid d-flex px-3">
@@ -11,68 +12,145 @@
 
 <div class="px-3 py-3">
 
-    <form>
+    <EditForm Model="@Form" OnValidSubmit="Save" class="pb-6">
+        <DataAnnotationsValidator />
+
         <label class="pb-2">Bokomslag</label>
+
         <div class="upload-container mb-3">
             <div class="px-5 py-3">
+
                 <div class="img-preview">
-                    <i class="bi bi-upload fs-1"></i>
+                    @if (string.IsNullOrEmpty(Form.ImageFileName))
+                    {
+                        <i class="bi bi-upload fs-1"></i>
+                    }
+                    else
+                    {
+                        <img src="@GetImage(Form.ImageFileName)" class="book-image" />
+                    }
                 </div>
 
-                <button type="file"
-                        class="btn btn-primary w-100 mt-3 d-flex align-items-center justify-content-center gap-2">
+                <button type="button"
+                        class="btn btn-primary w-100 mt-3 d-flex align-items-center justify-content-center gap-2"
+                        @onclick="PickFile">
                     <i class="bi bi-upload"></i>
                     Välj en bild
                 </button>
             </div>
         </div>
-
+            
         <div class="mb-3">
-            <label class="form-label">Titel</label>
-
-            <input type="text" class="form-control is-invalid">
-
-            <div class="invalid-feedback">
-                Du måste ange en titel
-            </div>
+            <label for="title" class="form-label">Titel</label>
+            <InputText class="form-control input" @bind-Value="Form.Title" />
+            <ValidationMessage For="@(() => Form.Title)" class="invalid-feedback d-block validation-text" />
         </div>
 
         <div class="mb-3">
             <label class="form-label">Författare</label>
-            <input type="text" class="form-control input">
+            <InputText type="text" class="form-control input" @bind-Value="Form.Author" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Utgiven</label>
+            <InputNumber type="text" class="form-control input" @bind-Value="Form.PublishedYear" />
         </div>
 
         <div class="mb-3">
             <label class="form-label">Skick</label>
-            <select class="form-select input">
+            <InputSelect class="form-select input" @bind-Value="Form.Condition">
                 <option selected>Välj</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
-            </select>
+                <option value="Nyskick">Nyskick</option>
+                <option value="Bra">Bra</option>
+                <option value="Sliten">Sliten</option>
+            </InputSelect>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Typ</label>
-            <select class="form-select input">
+            <InputSelect class="form-select input" @bind-Value="Form.Type">
                 <option selected>Välj</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
-            </select>
+                <option value="Inbunden">Inbunden</option>
+                <option value="Pocket">Pocket</option>
+            </InputSelect>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Utgåva</label>
-            <input type="text" class="form-control input">
+            <InputText type="text" class="form-control input" @bind-Value="Form.Edition" />
         </div>
 
         <div class="mb-4">
             <label class="form-label">Beskrivning</label>
-            <textarea class="form-control input" rows="4"></textarea>
+            <InputTextArea class="form-control input" rows="4" @bind-Value="Form.Description"></InputTextArea>
         </div>
 
-        <button type="button" class="btn btn-primary btn-custom">Lägg till bok</button>
-    </form>
-
+        <button type="submit" class="btn btn-primary btn-custom">Lägg till bok</button>
+    </EditForm>
 </div>
+
+@code {
+    public AddBookForm Form { get; set; } = new();
+
+    public async Task Save()
+    {
+        var result = await BookService.CreateBookAsync(Form);
+
+        if (result.Success)
+        {
+            NavManager.NavigateTo("/");
+        }
+    }
+
+    private async Task PickFile()
+    {
+        var result = await FilePicker.PickAsync(new PickOptions
+        {
+            PickerTitle = "Välj en bild",
+            FileTypes = FilePickerFileType.Images
+        });
+
+        if (result != null)
+        {
+            var folder = Path.Combine(FileSystem.AppDataDirectory, "images");
+
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(result.FileName)}";
+            var fullPath = Path.Combine(folder, fileName);
+
+            using var stream = await result.OpenReadAsync();
+            using var newStream = File.OpenWrite(fullPath);
+
+            await stream.CopyToAsync(newStream);
+
+            Form.ImageFileName = fileName;
+        }
+    }
+
+    private string GetImage(string fileName)
+    {
+        if (string.IsNullOrEmpty(fileName))
+            return null!;
+
+        var path = Path.Combine(FileSystem.AppDataDirectory, "images", fileName);
+
+        if (!File.Exists(path))
+            return null!;
+
+        var extension = Path.GetExtension(fileName).ToLower();
+        var mimeType = extension switch
+        {
+            ".png" => "image/png",
+            ".jpg" => "image/jpeg",
+            ".jpeg" => "image/jpeg",
+            _ => "image/jpeg"
+        };
+
+        var bytes = File.ReadAllBytes(path);
+        var base64 = Convert.ToBase64String(bytes);
+
+        return $"data:{mimeType};base64,{base64}";
+    }
+}

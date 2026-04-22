@@ -1,4 +1,8 @@
 ﻿@page "/"
+@using MyBookCollection.Business.Models
+@inject IBookService BookService
+@inject NavigationManager NavManager
+
     <nav class="navbar bg-primary">
         <div class="container-fluid d-flex px-3">
             <div class="d-flex text-light py-4 gap-2 w-100 align-items-center">
@@ -16,43 +20,90 @@
     <div class="px-3 py-3">
         <div class="d-flex w-100 align-items-end mt-2">
             <h3 class="fw-semibold fs-3 mb-0">Alla böcker</h3>
-            <p class="small ms-auto mb-0">6 böcker</p>
+            <p class="small ms-auto mb-0">@books.Count() böcker</p>
         </div>
 
-        <div class="mt-4 d-flex flex-column gap-3">
-            <div class="book-card">
+        <div class="mt-4 d-flex flex-column gap-3 mb-6">
+        @foreach (var book in books)
+        {
+            <div class="book-card" @onclick="() => GoToDetails(book.Id)">
                 <div class="img-container">
-                    <img src="/images/mist.png" alt="">
+                    @if (!string.IsNullOrEmpty(book.ImageFileName))
+                    {
+                        <img src="@GetImage(book.ImageFileName)" alt="">                                         
+                    }
+                    else
+                    {
+                        <div class="no-image">
+                            <span class="text-muted">Ingen bild</span>
+                        </div>
+                    }
                 </div>
                 <div class="card-info">
-                    <h5 class="card-title fw-semibold">The Mist</h5>
-                    <p class="card-author">Stephen King</p>
+                    <h5 class="card-title fw-semibold">@book.Title</h5>
+                    <p class="card-author">@book.Author</p>
                     <div class="d-flex gap-2 mt-2">
-                        <span class="badge rounded-pill badge-condition-good">Bra</span>
-                        <span class="badge rounded-pill badge-type">Inbunden</span>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center ms-auto">
-                    <i class="bi bi-chevron-right"></i>
-                </div>
-            </div>
+                        @switch(book.Condition)
+                        {
+                            case "Nyskick":
+                                <span class="badge rounded-pill badge-condition-new">@book.Condition</span>
+                                break;
+                            case "Bra":
+                                <span class="badge rounded-pill badge-condition-good">@book.Condition</span>
+                                break;
+                            case "Sliten":
+                                <span class="badge rounded-pill badge-condition-worn">@book.Condition</span>
+                                break;
+                        }
 
-            <div class="book-card">
-                <div class="img-container">
-                    <img src="/images/mist.png" alt="">
-                </div>
-                <div class="card-info">
-                    <h5 class="card-title fw-semibold">The Shining</h5>
-                    <p class="card-author">Stephen King</p>
-                    <div class="d-flex gap-2 mt-2">
-                        <span class="badge rounded-pill badge-condition-new">Nyskick</span>
-                        <span class="badge rounded-pill badge-type">Pocket</span>
+                        <span class="badge rounded-pill badge-type">@book.Type</span>
                     </div>
                 </div>
                 <div class="d-flex align-items-center ms-auto">
                     <i class="bi bi-chevron-right"></i>
                 </div>
             </div>
+        }
+            
         </div>
     </div>
+
+@code {
+    public IEnumerable<BookModel> books = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        books = await BookService.GetAllBooksAsync();
+    }
+
+    private string GetImage(string fileName)
+    {
+        if (string.IsNullOrEmpty(fileName))
+            return null!;
+
+        var path = Path.Combine(FileSystem.AppDataDirectory, "images", fileName);
+
+        if (!File.Exists(path))
+            return null!;
+
+        var extension = Path.GetExtension(fileName).ToLower();
+        var mimeType = extension switch
+        {
+            ".png" => "image/png",
+            ".jpg" => "image/jpeg",
+            ".jpeg" => "image/jpeg",
+            _ => "image/jpeg"
+        };
+
+        var bytes = File.ReadAllBytes(path);
+        var base64 = Convert.ToBase64String(bytes);
+
+        return $"data:{mimeType};base64,{base64}";
+    }
+
+    public void GoToDetails(int id)
+    {
+        NavManager.NavigateTo($"bookdetails/{id}");
+    }
+}
 

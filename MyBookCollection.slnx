@@ -1,5 +1,7 @@
 <Solution>
   <Project Path="MyBookCollection.Business/MyBookCollection.Business.csproj" Id="f8b219e4-a7a1-4c20-a57c-7b0eeea3f38a" />
   <Project Path="MyBookCollection.Data/MyBookCollection.Data.csproj" Id="177aa942-38e0-4f06-8602-716df942b5d6" />
-  <Project Path="MyBookCollection.Presentation/MyBookCollection.Presentation.csproj" />
+  <Project Path="MyBookCollection.Presentation/MyBookCollection.Presentation.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
 </Solution>
