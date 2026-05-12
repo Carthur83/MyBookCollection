@@ -114,6 +114,13 @@ input.invalid {
     border-radius: 14px;
 }
 
+.btn:focus,
+.btn:focus-visible,
+.btn:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 .book-card {
     height: 7.5rem;
     border-radius: 14px;
